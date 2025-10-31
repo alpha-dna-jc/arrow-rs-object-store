@@ -106,7 +106,9 @@ impl ObjectStoreScheme {
         let strip_bucket = || Some(url.path().strip_prefix('/')?.split_once('/')?.1);
 
         let (scheme, path) = match (url.scheme(), url.host_str()) {
-            ("file", _) => (Self::Local, url.path()),
+            ("file", host) => return Ok((Self::Local, if host.is_some(){
+                Path::from_iter(Path::from_url_path(url.path())?.parts().skip(1))
+            } else {Path::from_url_path(url.path())?})),
             ("memory", None) => (Self::Memory, url.path()),
             ("s3" | "s3a", Some(_)) => (Self::AmazonS3, url.path()),
             ("gs", Some(_)) => (Self::GoogleCloudStorage, url.path()),
@@ -195,7 +197,7 @@ where
 {
     let _options = options;
     let (scheme, path) = ObjectStoreScheme::parse(url)?;
-    let mut path = Path::parse(path)?;
+    let path = Path::parse(path)?;
 
     let store = match scheme {
         #[cfg(all(feature = "fs", not(target_arch = "wasm32")))]
@@ -203,7 +205,6 @@ where
             if url.has_host() {
                 use std::path::PathBuf;
                 let fp: PathBuf = url.to_file_path().expect("Invalid file path").iter().take(1).collect();
-                path = Path::from_iter(path.parts().skip(1));
                 Box::new(LocalFileSystem::new_with_prefix(fp).expect("Invalid file system path")) as _
             } else {
                 Box::new(LocalFileSystem::new()) as _
