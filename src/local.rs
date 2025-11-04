@@ -97,7 +97,7 @@ pub(crate) enum Error {
     #[error("Error seeking file {}: {}", path.display(), source)]
     Seek { source: io::Error, path: PathBuf },
 
-    #[error("Unable to convert URL \"{}\" to filesystem path", url)]
+    #[error("Unable to convert URL2 \"{}\" to filesystem path", url)]
     InvalidUrl { url: Url },
 
     #[error("AlreadyExists")]
