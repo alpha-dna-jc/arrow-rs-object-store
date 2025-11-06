@@ -204,8 +204,8 @@ where
         #[cfg(all(feature = "fs", not(target_arch = "wasm32")))]
         ObjectStoreScheme::Local => { 
             #[cfg(target_os = "windows")]
-            let box_store = if url.host().is_some() {
-                Box::new(LocalFileSystem::new_for_windows_unc(url.clone())) as _
+            let box_store = if url.has_host() {
+                Box::new(LocalFileSystem::new_for_windows_unc(url.clone())?) as _
             } else {
                 Box::new(LocalFileSystem::new()) as _
             };
