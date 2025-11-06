@@ -247,7 +247,11 @@ impl LocalFileSystem {
 
     /// Create new filesystem storage with windows UNC file
     /// Do not use if path is not a window UNC path
-    pub (crate) fn new_for_unc(mut base: Url) -> Self {
+    #[cfg(target_os = "windows")]
+    pub fn new_for_windows_unc(mut base: Url) -> Result<Self> {
+        if base.host().is_none() {
+            return Err(Error::InvalidUrl { url: base }.into());
+        }
         base.set_path("/");
         Self {
             config: Arc::new(Config {
