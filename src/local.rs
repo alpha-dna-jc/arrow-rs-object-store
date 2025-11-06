@@ -256,6 +256,7 @@ impl LocalFileSystem {
                     root: base,
                 }),
             automatic_cleanup: false,
+            }
         } else {
             return Err(Error::InvalidUrl { url: base }.into());
         }
